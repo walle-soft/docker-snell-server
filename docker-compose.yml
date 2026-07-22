@@ -1,0 +1,21 @@
+services:
+  snell:
+    # 本地构建:docker compose build
+    build:
+      context: .
+      args:
+        SNELL_VERSION: v5.0.1
+    # 或直接使用已发布镜像:
+    # image: ghcr.io/walle-soft/docker-snell-server:latest
+    container_name: snell-server
+    restart: unless-stopped
+    ports:
+      - "9102:9102"
+    environment:
+      PORT: "9102"
+      # 不填 PSK 会自动随机生成(可在容器日志中查看)
+      PSK: "your-pre-shared-key"
+      OBFS: "off"          # off / http / tls
+      OBFS_HOST: "icloud.com"
+      IPV6: "false"
+      # DNS: "1.1.1.1,8.8.8.8"
