@@ -24,15 +24,20 @@ RUN set -eux; \
     install -m 0755 /tmp/snell/snell-server /usr/local/bin/snell-server
 
 # ---------- Runtime ----------
-FROM alpine:3.20
+# 必须用 glibc 基础镜像(Debian):snell-server 是针对 glibc 构建的静态 PIE 二进制,
+# 运行时会 dlopen glibc 的 NSS 库(libnss_*/libresolv)做域名解析。
+# Alpine 的 musl 缺少这些 .so,会导致容器启动即以退出码 127 结束。
+FROM debian:bookworm-slim
 
 LABEL org.opencontainers.image.title="snell-server" \
       org.opencontainers.image.description="Multi-arch (amd64/arm64) Snell server" \
       org.opencontainers.image.source="https://github.com"
 
-RUN apk add --no-cache ca-certificates tzdata \
-    && addgroup -S snell \
-    && adduser -S -G snell snell
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends ca-certificates tzdata \
+    && rm -rf /var/lib/apt/lists/* \
+    && groupadd --system snell \
+    && useradd --system --gid snell --no-create-home --shell /usr/sbin/nologin snell
 
 COPY --from=builder /usr/local/bin/snell-server /usr/local/bin/snell-server
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
