@@ -25,7 +25,10 @@ fi
   echo "ipv6 = ${IPV6}"
   if [ "$OBFS" != "off" ] && [ -n "$OBFS" ]; then
     echo "obfs = ${OBFS}"
-    echo "obfs-host = ${OBFS_HOST}"
+    # 仅在显式设置了 OBFS_HOST 时才写入
+    if [ -n "$OBFS_HOST" ]; then
+      echo "obfs-host = ${OBFS_HOST}"
+    fi
   else
     echo "obfs = off"
   fi

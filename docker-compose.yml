@@ -16,6 +16,6 @@ services:
       # 不填 PSK 会自动随机生成(可在容器日志中查看)
       PSK: "your-pre-shared-key"
       OBFS: "off"          # off / http / tls
-      OBFS_HOST: "icloud.com"
+      # OBFS_HOST: "icloud.com"   # 仅在启用 OBFS 且需要指定域名时才设置
       IPV6: "false"
       # DNS: "1.1.1.1,8.8.8.8"

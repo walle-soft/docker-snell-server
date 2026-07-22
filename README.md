@@ -41,7 +41,7 @@ docker compose up -d
 | `PORT` | `9102` | 监听端口 |
 | `PSK` | (随机) | 预共享密钥,留空自动生成 |
 | `OBFS` | `off` | 混淆方式:`off` / `http` / `tls` |
-| `OBFS_HOST` | `icloud.com` | 混淆域名(仅 `OBFS` 非 off 时生效) |
+| `OBFS_HOST` | (空) | 混淆域名,仅在 `OBFS` 非 off **且显式设置**时才写入配置 |
 | `IPV6` | `false` | 是否监听 IPv6(`true` 时监听 `::`) |
 | `DNS` | (空) | 自定义 DNS,如 `1.1.1.1,8.8.8.8` |
 

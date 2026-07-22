@@ -49,7 +49,6 @@ RUN chmod +x /usr/local/bin/entrypoint.sh \
 ENV PORT=9102 \
     PSK="" \
     OBFS=off \
-    OBFS_HOST=icloud.com \
     IPV6=false \
     DNS=""
 
