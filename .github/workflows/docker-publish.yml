@@ -39,13 +39,33 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      # 决定要打包的 Snell 版本:
+      #   - 手动触发(workflow_dispatch):用输入的 snell_version
+      #   - 推 git tag(如 v6.0.0rc):用 tag 名,tag 名即 Snell 版本
+      #   - 推分支:用默认稳定版
+      - name: Resolve Snell version
+        id: ver
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            V="${{ github.event.inputs.snell_version }}"
+          elif [ "${{ github.ref_type }}" = "tag" ]; then
+            V="${{ github.ref_name }}"
+          else
+            V="v5.0.1"
+          fi
+          echo "snell_version=$V" >> "$GITHUB_OUTPUT"
+          echo "Resolved Snell version: $V"
+
       - name: Extract metadata
         id: meta
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          # latest 只跟随默认分支(稳定版);tag 事件按原始 tag 名打镜像标签,
+          # 因此 v6.0.0rc 这类预览版会得到独立的 :v6.0.0rc 标签,且不会覆盖 :latest
           tags: |
             type=raw,value=latest,enable={{is_default_branch}}
+            type=ref,event=tag
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=sha,prefix=sha-
@@ -59,6 +79,6 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
-            SNELL_VERSION=${{ github.event.inputs.snell_version || 'v5.0.1' }}
+            SNELL_VERSION=${{ steps.ver.outputs.snell_version }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
